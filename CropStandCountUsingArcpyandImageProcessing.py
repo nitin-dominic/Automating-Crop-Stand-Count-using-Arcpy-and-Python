@@ -1,9 +1,4 @@
 # This script counts crops using multiple ArcGIS tools and a bit of Image Processing.  
-# Prerequisites before using this algorithm/script:
-# 1. Imagery should be provided by the user. Either it should be RGB imagery or Multispectral. Several Indices can be 
-# calculated and exported in local drive bsaed on the imagery type provided
-# 2. Shapefile (a polygon line drawn over the crops) should be provided by the user.
-# Limitation of this algorithm: Weeds gets counted if they are present in-between the crops
 # Original workflow in ArcGIS was developed by Dr. J. Paulo Flores (Assistant Prof. at NDSU)
 # Codes were developed by Nitin Rai (PhD Student)
 # Agricultural Engineering, Precision Agriculture
