@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 # This script counts crops using multiple ArcGIS tools and a bit of Image Processing.  
 # Prerequisites before using this algorithm/script:
 # 1. Imagery should be provided by the user. Either it should be RGB imagery or Multispectral. Several Indices can be 
@@ -14,10 +8,6 @@
 # Codes were developed by Nitin Rai (PhD Student)
 # Agricultural Engineering, Precision Agriculture
 # North Dakota State University, USA
-
-
-# In[43]:
-
 
 # Importing packages
 import numpy as np
@@ -37,10 +27,6 @@ import copy
 import csv
 import os
 import sys
-
-
-# In[5]:
-
 
 # Reading the imagery (can be .jpg or .png too) from the local HD
 RGB_imagery = r"E:/Nitin.Rai/Lab8/output/Sunflowers.tif"
@@ -65,10 +51,6 @@ print(band_count)
 # Excess = r'C:\Users\nitin.rai\Desktop\ArcGIS Pro\PAG654LABS\Lab7\Lab_Practice\Sunf_ExGr_AOI_Lab7.tif'
 # raster_dataset = gdal.Open(Excess)
 # env.outputCoordinateSystem = arcpy.SpatialReference("WGS_1984_UTM_Zone_14N")
-
-
-# In[6]:
-
 
 #################### Additional features in this script/algorithm #############################
 ###############################################################################################
@@ -118,29 +100,17 @@ else:
     arcpy.BuildPyramids_management(ExGreen_filename, "", "NONE", "BILINEAR","", "", "")
     print ("Excess Green pyramids successfully calculated")
 
-
-# In[7]:
-
-
 # Sharpening the image so the objects (crops & weeds) details are highlighted
 sharpen_ExGreen = arcpy.ia.Convolution(ExGreen, 20)
 sharpen_ExGreen.save(r'E:/Nitin.Rai/Lab8/output/ExGreen_Sharpened.tif')
 print("You have successfully sharpened the Excess Green.tif file!")
 arcpy.BuildPyramids_management(sharpen_ExGreen, "", "NONE", "BILINEAR","", "", "")
 
-
-# In[8]:
-
-
 # Converting the above sharpened image into binary image, thresholding technique is applied here 
 # converting the imagery into 0 and 1.
 binary_raster = arcpy.ia.Threshold(sharpen_ExGreen)
 binary_raster.save(r"E:/Nitin.Rai/Lab8/output/ThresholdSharpen.tif")
 print("You have successfully perfromed Imagery Thresholding!")
-
-
-# In[9]:
-
 
 # Converting Raster to Polygon (a shapefile is generated for the whole raster file)
 # objects within the raster file is 1s while all the rest is 0s
@@ -151,19 +121,11 @@ field = "VALUE"
 arcpy.RasterToPolygon_conversion(inRaster, outPolygons, "NO_SIMPLIFY", field)
 print("You have successfully converted Raster to Polygon!")
 
-
-# In[10]:
-
-
 # Selecting all the 1s so that we can export a shapefile for all the objects labeled 1s within the imagery
 arcpy.env.workspace = r'E:/Nitin.Rai/Lab8/output'
 polygonAttached = "RasterToPolygonConvert.shp"
 selectedAttributes = arcpy.SelectLayerByAttribute_management(polygonAttached, "NEW_SELECTION", '"gridcode" > 0')
 arcpy.CopyFeatures_management(selectedAttributes, 'Attributes_SelectedGridOne')
-
-
-# In[13]:
-
 
 # At this step, user provides a line shpaefile denoting crop rows.
 arcpy.env.workspace = r'E:/Nitin.Rai/Lab8/output'
@@ -177,20 +139,12 @@ dissolve = "NONE"
 # Finally storing the buffer shapefile in Buffered_CropsLine
 Buffered_CropsLine = arcpy.Buffer_analysis(cropsline, rowsBuffered, distanceField, sideType, endType, dissolve)
 
-
-# In[14]:
-
-
 # At this step we are going to intersect buffered rows with polygon we created while converting raster to polygon
 arcpy.env.workspace = r'E:/Nitin.Rai/Lab8/output'
 BufferFeature = ["ROI_Buffered2Inches.shp", "RasterToPolygonConvert.shp"]
 OutputIntersect = r'E:/Nitin.Rai/Lab8/output/IntersectBufferedPolygons.shp'
 join_attributes = "ALL"
 arcpy.Intersect_analysis(BufferFeature, OutputIntersect, join_attributes, "", "INPUT")
-
-
-# In[19]:
-
 
 # At this step we are going to dissolve buffered rows with polygon we created in the last step
 arcpy.env.workspace = r'E:/Nitin.Rai/Lab8/output'
@@ -202,20 +156,9 @@ multi_features = "MULTI_PART"
 arcpy.Dissolve_management(dissolve_features, output_dissolve, dissolve_field, statitics_field, 
                                 multi_features, "")
 
-
-# In[52]:
-
-
 arcpy.env.workspace = r'E:/Nitin.Rai/Lab8/output'
 in_table = r'E:/Nitin.Rai/Lab8/output/randomcounts/RandomOutputAccept.dbf'
 out_path = r'E:/Nitin.Rai/Lab8/output/randomcounts'
 out_csv = "cropcountsExcel.csv"
 # in_delimiter = "COMMA"
 arcpy.TableToTable_conversion(in_table, out_path, out_csv, "", "", "")
-
-
-# In[ ]:
-
-
-
-
